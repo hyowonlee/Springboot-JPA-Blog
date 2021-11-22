@@ -39,7 +39,7 @@ public class Board {
 	@Lob // 대용량 데이터
 	private String content ;// 섬머노트 라이브러리 사용할거라 우리가 적는 글이 디자인이 되서 html태그가 섞여서 들어감 그래서 용량이 커져서 들어가서 @Lob 사용
 	
-	@ColumnDefault("0")//게시물 처음 만들면 조회수 0이니 디폴트값 0
+	//@ColumnDefault("0")//게시물 처음 만들면 조회수 0이니 디폴트값 0 //우리가 값 넣는다고 주석처리
 	private int count; //조회수
 	
 	
@@ -52,7 +52,7 @@ public class Board {
 	private User user; //db에는 알아서 foreign키로 user의 id가 저장이 됨 (int형태로 id가 저장됨)
 	//db는 오브젝트를 저장할 수 없다. 자바는 오브젝트를 저장할 수 있다. 보통 작성자를 db에서 표현할땐 자바가 db에 맞춰서 원래는 foreign키로 저장하게 되는데 jpa(orm)에선 foreign키로 저장하지 않고 오브젝트로 저장할 수 있다. 이런식으로 작성하면 자동으로 외래키로 표현해줌
 	
-	@OneToMany(mappedBy = "board", fetch = FetchType.EAGER) // reply 테이블의 board(변수이름)으로 mappedBy가 적혀있으면 난 fk가 아니라는 뜻
+	@OneToMany(mappedBy = "board", fetch = FetchType.EAGER) // reply 테이블의 board(변수이름)으로 mappedBy가 적혀있으면 난 fk가 아니라는 뜻(db에 만들어지는 값이 아니라는거)
 	//(연관관계의 주인이 아님)그러니 db에 column을 만들지 마라 fk는 reply에 있는 boardId임 이 변수는 그냥 board를 select할때 join을 통해서 답글 값을 얻기위한 것임
 	//onetomany이면 이 값이 여러개가 될 수 있음 그래서 기본전략이 fetch = FetchType.LAZY로 필요하면 가져오고 아니면 안가져오는 전략
 	//하지만 우리는 처음부터 댓글이 보이게 될 거니 반드시 가져와야되는 정보로 eager전략으로 바꿔줄것 (fetch안쓰면 자동으로 기본전략으로 들어감)

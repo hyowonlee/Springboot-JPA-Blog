@@ -38,7 +38,7 @@ public class User {
 	//오라클을 연결했다면 sequence 형식 mysql을 연결했다면 autoincrement를 사용한다는 의미 즉 db의 기본전략을 따라감
 	private int id; //primary key (오라클에선 시퀀스, mysql에선 auto_increment)
 	
-	@Column(nullable = false, length = 30) // username이 null이면 안되기 때문에 이 어노테이션으로 null이 안들어가게 해줌, 길이 최대 30
+	@Column(nullable = false, length = 30, unique = true) // username이 null이면 안되기 때문에 이 어노테이션으로 null이 안들어가게 해줌, 길이 최대 30
 	private String username; // 아이디
 	  
 	@Column(nullable = false, length = 100) // 암호 길이를 길게 주는이유는 나중에 이 암호를 해쉬로 변경해 암호화해서 암호화된 pw를 db에 넣을거기 때문에

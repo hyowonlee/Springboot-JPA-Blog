@@ -71,14 +71,14 @@ public class HttpControllerTest {
 	//그래서 포스트맨의 body에 x-www-form-urlencoded로 요청하면 html의 <form> 태그로 요청하는방식으로 데이터전송
 	
 	@PostMapping("/http/post2")
-	public String postTest2(@RequestBody String text) // 요청의 body값을 해당 변수에 넣어주는 어노테이션
+	public String postTest2(@RequestBody String text) // 요청의 body값을 해당 변수에 넣어주는 어노테이션(http요청과 함께받은 json데이터를 java객체에 매핑하기위해 사용)
 	{
 		return "post 요청 : " + text;
 	}
 	//포스트맨의 post요청 body에 raw 방식으로 텍스트(평문 text/plain 이라고 포스트맨에 설정할수있음)를 요청하면 String 변수에 평문을 담아줌
 	
 	@PostMapping("/http/post3")
-	public String postTest3(@RequestBody Member m) // 요청의 body값을 해당 변수에 넣어주는 어노테이션
+	public String postTest3(@RequestBody Member m) // 요청의 body값을 해당 변수에 넣어주는 어노테이션(http요청과 함께받은 json데이터를 java객체에 매핑하기위해 사용)
 	{
 		return "post 요청 : " + m.getId() + "," + m.getUsername() + "," + m.getPassword() +","+m.getEmail();
 	}
@@ -95,7 +95,7 @@ public class HttpControllerTest {
 	
 	//http://localhost:8000/http/put    (update)
 	@PutMapping("/http/put")
-	public String putTest(@RequestBody Member m) // 요청의 body값을 해당 변수에 넣어주는 어노테이션
+	public String putTest(@RequestBody Member m) // 요청의 body값을 해당 변수에 넣어주는 어노테이션(http요청과 함께받은 json데이터를 java객체에 매핑하기위해 사용)
 	{
 		return "put 요청 : " + m.getId() + "," + m.getUsername() + "," + m.getPassword() +","+m.getEmail();
 	}

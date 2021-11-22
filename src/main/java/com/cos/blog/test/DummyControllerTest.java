@@ -3,15 +3,23 @@ package com.cos.blog.test;
 import java.util.List;
 import java.util.function.Supplier;
 
+import javax.transaction.Transactional;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cos.blog.model.RoleType;
@@ -96,7 +104,47 @@ public class DummyControllerTest {
 		List<User> users = pagingUser.getContent(); // 이렇게 pagingUser의 .getContent()를 쓰면 List형태로 필요한 데이터인 Content만 리턴해준다 이렇게 List로 리턴해주는게 좋데 이외에 Page클래스는 isFirst(), isLast()같은 if로 분기처리 할수있는 함수들도 지원해줌 
 		
 		return users; // 다끝나면 결과는 List형태로 리턴해주는게 좋다
+		//이거 리턴값을 Page로 바꿔주고 pagingUser를 리턴해주면 페이징 만들수 있는 정보도 같이 전송시켜줌 (바로밑에 만듬)
 	}
+	//이게 바로위에거 Page를 리턴해주는거
+	@GetMapping("/dummy/userreturnpage")
+	public Page<User> pageListReturnPage(@PageableDefault(size=2, sort="id", direction=Sort.Direction.DESC) Pageable pageable)
+	{
+		Page<User> pagingUser = userRepository.findAll(pageable); 
+		
+		List<User> users = pagingUser.getContent();  
+		
+		return pagingUser; 
+	}
+	
+	/* update하는 방법들*/
+	//email과 pw를 수정하는 함수
+	@Transactional //더티 체킹 , 이 어노테이션을 사용하면 userRepository의 save함수를 사용하지 않아도 update가 된다
+	@PutMapping("/dummy/user/{id}") // 수정이니 put, select랑 url이 같지만 그놈은 get이고 이건 put이라 알아서 구분함 
+	public User updateUser(@PathVariable int id, @RequestBody User requestUser) // 이번엔 insert처럼 form태그로 값을 받지않고 @RequestBody를 통해 json형태로 받아볼것으로 requestUser에 User를 받아옴
+	{ //json 데이터를 요청했는데 스프링의 messageconverter가 jackson라이브러리를 통해 javaobject로  바꿔서 받아줌 이렇게 수행될때 사용하는 어노테이션이 @RequestBody
+		System.out.println("id:"+id);
+		System.out.println("password:"+requestUser.getPassword());
+		System.out.println("email:"+requestUser.getEmail());
+		
+		User user = userRepository.findById(id).orElseThrow(()->{ //db에서 해당 id의 정보들을 select해서 받아와서 user에 넣어줌
+			return new IllegalArgumentException("수정에 실패하였습니다."); //만약 db에서 해당하는 id를 찾지 못하면 insert되면 안되니 실패로 return 시켜줌
+			});
+		
+		//user가 db에 있던 원래정보들을 가지고있으니 변경될 값들만 user에 새로 넣어주면 됨
+		user.setPassword(requestUser.getPassword());
+		user.setEmail(requestUser.getEmail());
+		
+		//하지만 앞으로 update할때는 save함수 안쓸거고 이거 대신 @Transactional로 update해볼거 (더티체킹)
+		//userRepository.save(user); // save함수는 insert할때 써주는건데 id값이 이미 db에 있는값이면 update로 수행해줌 근데 모든 필드에대해 update해서 전해준 값 이외에 값이 없으면 전부 null로 들어감 그래서 위에서 저렇게 값을 db에서 가져와서 넣어주는거
+		//save함수는 id를 전달하지 않으면 insert를 해주고
+		//save함수는 id를 전달하면 해당 id 데이터가 있으면 update 없으면 insert를 해줌
+
+		//user에 db에서 값 받아오고 수정할 것만 값 수정해주고 @Transactional만 적어주면 update가 된다 (@Transactional의 더티체킹)
+		//더티체킹은 처음 가져온 객체의 정보와 종료시 객체의 정보를 비교해서 다른 부분이 있다면 update해주는것 (db에서는 트랜잭션 해야될걸 모아서 한번에 commit 하는걸 더티체킹이라함)
+		return user;
+	}
+	
 	
 	/* insert하는 방법들 */
 	
@@ -134,6 +182,19 @@ public class DummyControllerTest {
 		*근데 이 방법은 안쓸거 어노테이션을 덕지덕지 붙이는건 좋지않고 직접 구현하는편이 잡기술이 아니고 좋음
 		*/
 		return "회원가입이 완료되었습니다.";
+	}
+	
+	/* delete하는 방법들 */
+	@DeleteMapping("/dummy/user/{id}") // restful의 delete를 보내면 수행되는거니 url이 다른 restful과 같을수도있음
+	public String delete(@PathVariable int id) 
+	{
+		try {
+			userRepository.deleteById(id);
+		} catch (EmptyResultDataAccessException e) {
+			return "삭제에 실패하였습니다 해당 id는 db에 없습니다."; // 만약 없는 id를 삭제 시도 할때 예외처리
+		}
+		
+		return "삭제되었습니다. id:"+id;
 	}
 	
 }
