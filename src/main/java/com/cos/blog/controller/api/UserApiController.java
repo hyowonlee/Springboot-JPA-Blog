@@ -4,11 +4,19 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cos.blog.config.auth.PrincipalDetail;
 import com.cos.blog.dto.ResponseDto;
 import com.cos.blog.model.RoleType;
 import com.cos.blog.model.User;
@@ -19,6 +27,9 @@ public class UserApiController {
 	
 	@Autowired //UserService 클래스 가보면 @Service 붙어있어서 DI가능
 	private UserService userService;
+	
+	@Autowired //SecurityConfig.java에서 만들어준 bean을 di (세션 생성용 매니저)
+	private AuthenticationManager authenticationManager;
 	
 	// 회원가입 요청시 user.js에서 ajax 통신할때 여기 url을 부름
 	@PostMapping("/auth/joinProc")
@@ -41,6 +52,27 @@ public class UserApiController {
 
 		
 	}  
+	
+	@PutMapping("/user")
+	public ResponseDto<Integer> update(@RequestBody User user)//json데이터 받을거라 @RequestBody 걸어줘야함 안걸면 json 못받음, 만약 @RequestBody가 없으면 key=value 값으로 받아야되고 그것의 mime 타입은 x-www-form-urlencoded 이걸로 받고 싶으면 안적어도됨																													
+	{
+		userService.회원수정(user);
+		
+		//여기서 회원수정 함수의 트랜잭션이 종료되기 때문에 db에 값은 변경이됐음
+		//하지만 세션값은 변경되지 않았기 때문에 회원 수정한 후 다시 회원 수정창에 들어가보면 값이 화면에는 안변경되어있음(세션은 변경 전 값이라 그런거)
+		//그래서 우리가 직접 세션값을 변경해줄 것 (노트에 61강 정리한거 보면 세션 만들어지는 과정있는데 그걸 참고해봐  https://blog.naver.com/getinthere/221804905967)
+		
+		//세션 등록(로그인이라고 봐도 될듯?),  authenticationManager가 토큰을 이용해서 Authentication 객체 생성
+		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+		//만들어진 Authentication객체를 시큐리티 컨택스트에 집어넣어서 세션 등록
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+		
+		return new ResponseDto<Integer>(HttpStatus.OK.value(), 1);
+	}
+	
+	
+	
+	
 	
 	
 	//스프링 시큐리티를 사용하므로 이건 사용 안함

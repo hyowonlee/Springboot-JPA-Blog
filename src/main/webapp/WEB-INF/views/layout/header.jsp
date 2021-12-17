@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%> <%-- jstl 라이브러리 추가 pom.xml에서도 설정 해야됨 --%>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %> <%-- spring security taglib --%>
 <sec:authorize access="isAuthenticated()">
-	<sec:authentication property="principal" var="principal"/>
+	<sec:authentication property="principal" var="principal"/> <%--이 var=principal은 PrincipalDetail.java의 PrincipalDetail 객체를 의미 그래서 principal.user라 하면 안의 user객체에 접근 가능--%>
 
 </sec:authorize>
 

@@ -8,12 +8,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.cos.blog.model.User;
 
+import lombok.Data;
 import lombok.Getter;
 
 //스프링 시큐리티는 로그인을 수행해서 세션을 만들때 UserDetails이라는 객체를 사용해야되는데 우리가 만든 User를 UserDetails로 바꿔줘야 시큐리티로 로그인이 가능하다 그래서 이 클래스로 바꿔주는 것
 // 스프링 시큐리티가 로그인 요청을 가로채서 로그인을 진행/완료가 되면 UserDetails 타입의 오브젝트를 스프링 시큐리티의 고유한 세션 저장소에 저장함 그때 이 UserDetails타입의 PrincipalDetail이 저장됨
 //PrincipalDetailService.java에서 User를 PrincipalDetail로 변환함
-@Getter
+@Data
 public class PrincipalDetail implements UserDetails {
 	private User user; //콤포지션 : 객체를 클래스 안에 품고있는걸 콤포지션 이라고 함 (extends하는건 상속이라하고 클래스 안에 해당 객체를 넣어주는게 콤포지션)
 	

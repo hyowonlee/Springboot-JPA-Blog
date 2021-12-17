@@ -3,6 +3,7 @@ package com.cos.blog.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -25,6 +26,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	@Autowired
 	private PrincipalDetailService principalDetailService;
 	
+	@Bean
+	@Override // UserApiController.java쪽에 update 함수에서 회원수정시 세션값 수정해주려고 사용
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		// TODO Auto-generated method stub
+		return super.authenticationManagerBean();
+	}
+
 	@Bean // BEAN등록으로 이 함수가 리턴하는 해쉬값을 스프링이 관리하게 IOC 됨
 	public BCryptPasswordEncoder encodePWD() //UserService.java 에서 사용 해당 문자열을 해쉬 암호화 시키는 해쉬함수
 	{
