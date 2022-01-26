@@ -16,14 +16,14 @@ import com.cos.blog.model.User;
 public interface UserRepository extends JpaRepository <User, Integer> //인터페이스가 인터페이스를 상속받을땐 extends 사용 
 {
 	//PrincipalDetailService.java에서 username을 db에서 찾을때 사용
-	// jpa 네이밍 쿼리전략으로 SELECT * FROM user WHERE username =1?;  매개변수가 1? 자리에 들어갈것
+	// jpa 네이밍 쿼리전략으로 이 함수 이름은 SELECT * FROM user WHERE username =?1; 을 의미  매개변수가 ?1 자리에 들어갈것
 	Optional<User> findByUsername(String username);
 	
 	
 	
 	//스프링 시큐리티를 사용하므로 이건 사용 안함
 //	//JPA Naming 쿼리 전략 이란게 있음 이 전략에 맞게 함수 이름을 지어주면 jpa가 들고있는 함수가 아니어도 자동으로 이름을 분석해 쿼리 로직을 만들어줌
-//	// 이 함수이름으론 SELECT * FROM user WHERE username = ?1 AND password = ?2;  username과 password의 ?1 ?2는 매개변수의 값이 들어가게됨
+//	// 이 함수이름은 SELECT * FROM user WHERE username = ?1 AND password = ?2; 으로  username과 password의 ?1 ?2는 매개변수의 값이 들어가게됨
 //	User findByUsernameAndPassword(String username, String password);
 //	
 //	

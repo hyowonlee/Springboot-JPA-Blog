@@ -27,6 +27,14 @@ public class UserService {
 	@Autowired
 	private BCryptPasswordEncoder encoder; //해쉬 암호화 시키려고 만든 변수
 
+	@Transactional(readOnly = true)
+	public User 회원찾기(String username) {
+		User user = userRepository.findByUsername(username).orElseGet(()->{
+			return new User(); // 유저이름으로 회원을 찾고 못찾으면 이걸(빈객체) 반환 (orElseGet)
+		});
+		return user;
+	}
+	
 	
 	@Transactional // 이 어노테이션을 붙여주면 이 함수 전체의 서비스가 하나의 트랜잭션으로 묶이게됨
 	public void 회원가입(User user) {
@@ -46,10 +54,17 @@ public class UserService {
 		User persistance = userRepository.findById(user.getId()).orElseThrow(()->{
 			return new IllegalArgumentException("회원 찾기 실패");
 		});
-		String rawPassword = user.getPassword(); // 지금 회원 수정 페이지에서 수정한 패스워드를 들고와서
-		String encPassword = encoder.encode(rawPassword); //암호화
-		persistance.setPassword(encPassword); // 암호화한 비밀번호를 User오브젝트에 설정
-		persistance.setEmail(user.getEmail()); //회원 수정 페이지에서 수정한 이메일을 들고와서 User오브젝트에 설정
+		
+		//validate 체크 (유효성 체크) => Oauth필드에 값이 있으면 수정 불가
+		//카카오 로그인한 사람들은 비밀번호, 이메일 변경이 안되어야함 jsp파일에서 안보이게 해줬지만 post 요청을 직접 쏠수도 있기에 서버단에서 유저 객체의 Oauth값이 일반 회원가입한 회원일때만 수정 로직을 태움
+		if(persistance.getOauth() == null || persistance.getOauth().equals("")) 
+		{
+			String rawPassword = user.getPassword(); // 지금 회원 수정 페이지에서 수정한 패스워드를 들고와서
+			String encPassword = encoder.encode(rawPassword); //암호화
+			persistance.setPassword(encPassword); // 암호화한 비밀번호를 User오브젝트에 설정
+			persistance.setEmail(user.getEmail()); //회원 수정 페이지에서 수정한 이메일을 들고와서 User오브젝트에 설정
+		}
+
 
 		
 		//회원수정 함수 종료 == 서비스종료 == 트랜잭션종료(@Transactional이니) == commit이 자동으로 됨(영속화된 persistance 객체의 변화가 감지되면 더티체킹이 되어 변화된것들을 자동으로 update문 날려줌)

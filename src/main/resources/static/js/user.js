@@ -60,9 +60,14 @@ let index =
 			/* data , contentType은 세트임 http로 데이터를 보내니 body 로 보내는것이고 body로 데이터를 보낼땐 그게 무슨 데이터인지 알릴 Mime타입이 필요 */
 			dataType: "json" // 요청을 해서 서버로 응답이 왔을때 기본적으로 모든 것이 문자열타입으로 받게됨 이때 받은 데이터의 모양이 json이라면 dataType에 json이라고 적어주면 응답의 결과를 javascript오브젝트로 변경해줌
 		}).done(function(resp){ //성공시 컨트롤러에서 리턴하는 값이 resp 안에 들어감
-			alert("회원가입이 완료되었습니다");
-			//console.log(resp);
-			location.href="/"; //회원가입 완료 후 이 경로로 이동
+			if(resp.status == 500 ){
+				alert("회원가입에 실패하였습니다");
+			}
+			else{
+				alert("회원가입이 완료되었습니다");	
+				//console.log(resp);
+				location.href="/"; //회원가입 완료 후 이 경로로 이동
+			}
 		}).fail(function(error){ //실패시 컨트롤러에서 리턴하는 값이 error 안에 들어감
 			JSON.stringify(error);
 		});

@@ -14,14 +14,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cos.blog.config.auth.PrincipalDetail;
+import com.cos.blog.dto.ReplySaveRequestDto;
 import com.cos.blog.dto.ResponseDto;
 import com.cos.blog.model.Board;
+import com.cos.blog.model.Reply;
 import com.cos.blog.model.RoleType;
 import com.cos.blog.model.User;
 import com.cos.blog.service.BoardService;
 import com.cos.blog.service.UserService;
 
-@RestController // 데이터만 리턴할거기에  @RestController (data를 응답해줌)
+@RestController // 데이터만 리턴할거기에  @RestController (@RestController는 data를 응답해줌, 메서드 반환타입앞에 @ResponseBody를 적어줘도 data를 리턴해주는 컨트롤러 함수가 됨)
 public class BoardApiController {
 	//이거 UserApiController.java와 같음 주석은 거기봐
 	
@@ -48,6 +50,35 @@ public class BoardApiController {
 		boardService.글수정하기(id, board);
 		return new ResponseDto<Integer>(HttpStatus.OK.value(), 1);//정상종료됐다는 1, 정상종료했다는 응답후 다시 board.js로 돌아감
 	}
+	
+	
+		//데이터 받을때 컨트롤러에서 dto(vo)를 만들어서 받는게 좋음
+		//이 프로젝트에서 dto 안쓴 이유는 작은 프로젝트여서임
+		@PostMapping("/api/board/{boardId}/reply")
+		public ResponseDto<Integer> replySave(@RequestBody ReplySaveRequestDto replySaveRequestDto)
+		{
+			boardService.댓글쓰기(replySaveRequestDto); //principal.getUser()를 통해 현재 로그인중인 세션의 User객체를 넘겨줌
+			return new ResponseDto<Integer>(HttpStatus.OK.value(), 1);//자바오브젝트를 Json으로 변환해서 리턴(Jackson) 정상종료됐다는 1, 정상종료했다는 응답후 다시 board.js로 돌아감
+		}  
+	
+		@DeleteMapping("/api/board/{boardId}/reply/{replyId}")
+		public ResponseDto<Integer> replyDelete(@PathVariable int replyId)
+		{
+			boardService.댓글삭제(replyId);
+			return new ResponseDto<Integer>(HttpStatus.OK.value(), 1);
+		}
+	
+	
+//	//데이터 받을때 컨트롤러에서 dto(vo)를 만들어서 받는게 좋음
+//	//여기서 dto 안쓴 이유는 작은 프로젝트여서
+//	@PostMapping("/api/board/{boardId}/reply")
+//	public ResponseDto<Integer> replySave(@PathVariable int boardId, @RequestBody Reply reply, @AuthenticationPrincipal PrincipalDetail principal) //컨트롤러에서 세션을 찾는 방법은 이 매개변수 처럼 어노테이션을 붙여서 UserDetails타입의 세션을 가져옴
+//	{
+//		boardService.댓글쓰기(principal.getUser(), boardId, reply); //principal.getUser()를 통해 현재 로그인중인 세션의 User객체를 넘겨줌
+//		return new ResponseDto<Integer>(HttpStatus.OK.value(), 1);//자바오브젝트를 Json으로 변환해서 리턴(Jackson) 정상종료됐다는 1, 정상종료했다는 응답후 다시 board.js로 돌아감
+//	}  
+	
+	
 	
 	//스프링 시큐리티를 사용하므로 이건 사용 안함
 //	//전통적인 방식의 로그인 방법

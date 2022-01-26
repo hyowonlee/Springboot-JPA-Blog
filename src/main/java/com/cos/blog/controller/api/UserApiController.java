@@ -22,7 +22,7 @@ import com.cos.blog.model.RoleType;
 import com.cos.blog.model.User;
 import com.cos.blog.service.UserService;
 
-@RestController // 데이터만 리턴할거기에  @RestController (data를 응답해줌)
+@RestController // 데이터만 리턴할거기에  @RestController (@RestController는 data를 응답해줌, 메서드 반환타입앞에 @ResponseBody를 적어줘도 data를 리턴해주는 컨트롤러 함수가 됨)
 public class UserApiController {
 	
 	@Autowired //UserService 클래스 가보면 @Service 붙어있어서 DI가능

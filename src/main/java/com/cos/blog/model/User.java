@@ -38,7 +38,7 @@ public class User {
 	//오라클을 연결했다면 sequence 형식 mysql을 연결했다면 autoincrement를 사용한다는 의미 즉 db의 기본전략을 따라감
 	private int id; //primary key (오라클에선 시퀀스, mysql에선 auto_increment)
 	
-	@Column(nullable = false, length = 30, unique = true) // username이 null이면 안되기 때문에 이 어노테이션으로 null이 안들어가게 해줌, 길이 최대 30
+	@Column(nullable = false, length = 150, unique = true) // username이 null이면 안되기 때문에 이 어노테이션으로 null이 안들어가게 해줌, 길이 최대 150
 	private String username; // 아이디
 	  
 	@Column(nullable = false, length = 100) // 암호 길이를 길게 주는이유는 나중에 이 암호를 해쉬로 변경해 암호화해서 암호화된 pw를 db에 넣을거기 때문에
@@ -52,6 +52,9 @@ public class User {
 	private RoleType role; // Enum 타입을 쓰는게 정확함, enum을쓰면 어떤데이터의 도메인(들어갈수있는 값들)을 만들어줄수 있음 (admin, user만 들어가게 할수있음)
 	//String으로 하면 실수가 있을수도 있으니 RoleType.java에서 선언한 enum타입으로 설정
 	
+	//카카오 oauth 로그인시 그 계정은 UserController.java에 있는 로직때문에 비밀번호를 변경하면 로그인이 안됨
+	//그래서 카카오로 로그인한 경우 비밀번호 변경을 못하게 하려고 필드 하나를 추가
+	private String oauth; // 일반적인 회원가입시 null 카카오oauth 회원가입시 kakao
 	
 	@CreationTimestamp //이 어노테이션쓰면 자바에서 현재 시간을 자동으로 입력해줌
 	private Timestamp createDate; // 이 회원이 가입한 시간

@@ -7,27 +7,29 @@
 <div class="container">
 
 	<form>
-		<input type="hidden" id="id" value="${principal.user.id }"/> <%-- 회원정보 수정의 자바스크립트 update 동작에서 username을 들고가지 않을거라 해당 회원을 식별하기 위해 hidden값을 넣어줌 --%>
+		<input type="hidden" id="id" value="${principal.user.id }" />
+		<%-- 회원정보 수정의 자바스크립트 update 동작에서 username을 들고가지 않을거라 해당 회원을 식별하기 위해 hidden값을 넣어줌 --%>
 		<div class="form-group">
-			<label for="username">Username</label> 
+			<label for="username">Username</label>
 			<%--회원정보는 굳이 select 안하고 세션에서 들고옴 --%>
 			<input type="text" value="${principal.user.username}" class="form-control" placeholder="Enter username" id="username" readonly="readonly">
 		</div>
-		
+
+		<c:if test="${empty principal.user.oauth}"> <%-- 카카오 회원일시 비밀번호 변경이 되면 카카오 로그인이 안되게 로직이 되어있으니 카카오 회원은 비번변경창이 안보이게 설정 --%>
+			<div class="form-group">
+				<label for="password">Password</label> <input type="password" class="form-control" placeholder="Enter password" id="password">
+			</div>
+		</c:if>
+
 		<div class="form-group">
-			<label for="password">Password</label> 
-			<input type="password" class="form-control" placeholder="Enter password" id="password">
+			<label for="email">Email</label> <input type="email" value="${principal.user.email }" class="form-control" placeholder="Enter email" id="email" readonly="readonly">
 		</div>
-		
-		<div class="form-group">
-			<label for="email">Email</label> 
-			<input type="email" value="${principal.user.email }" class="form-control" placeholder="Enter email" id="email">
-		</div>
-		
+
 
 	</form>
 
-	<button id="btn-update" class="btn btn-primary">회원수정완료</button>  <%--로그인 버튼을 form태그 안에 넣었기에 이걸 누르면 submit이 된다 (submit어딨나 한참 찾았는데 button으로도 되네) --%>
+	<button id="btn-update" class="btn btn-primary">회원수정완료</button>
+	<%--로그인 버튼을 form태그 안에 넣었기에 이걸 누르면 submit이 된다 (submit어딨나 한참 찾았는데 button으로도 되네) --%>
 
 </div>
 

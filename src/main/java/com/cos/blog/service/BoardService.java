@@ -11,11 +11,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.cos.blog.dto.ReplySaveRequestDto;
 import com.cos.blog.model.Board;
+import com.cos.blog.model.Reply;
 import com.cos.blog.model.RoleType;
 import com.cos.blog.model.User;
 import com.cos.blog.repository.BoardRepository;
 import com.cos.blog.repository.UserRepository;
+import com.cos.blog.repository.ReplyRepository;
 
 //이거 BoardService랑 같음 거기서 주석보셈
 
@@ -25,6 +28,12 @@ public class BoardService {
 
 	@Autowired
 	private BoardRepository boardRepository; // 이 객체를 통해 db 접근
+	
+	@Autowired
+	private UserRepository userRepository;
+	
+	@Autowired
+	private ReplyRepository replyRepository;
 	
 	@Transactional // 이 어노테이션을 붙여주면 이 함수 전체의 서비스가 하나의 트랜잭션으로 묶이게됨
 	public void 글쓰기(Board board, User user) { //title, content를 가져오고 
@@ -69,6 +78,55 @@ public class BoardService {
 		board.setContent(requestBoard.getContent());//updateForm에서 받았던 값으로 내용 수정
 		//해당함수 종료시(Service가 종료될때) 트랜잭션이 종료됨 이때 더티체킹으로 영속화된 board의 데이터가 db와 달라졌기에 더티체킹을 통해 db에 자동업데이트 해줌 (db쪽으로 flush됨 즉 commit이 된다는소리)
 	}
+	
+	@Transactional
+	public void 댓글쓰기(ReplySaveRequestDto replySaveRequestDto)
+	{
+//		//이건 dto 방식
+//		Board board = boardRepository.findById(replySaveRequestDto.getBoardId()).orElseThrow(()->{
+//			return new IllegalArgumentException("댓글쓰기 실패: 게시글 id를 찾을 수 없습니다.");
+//			//영속화 완료
+//		}) ;
+//		
+//		User user = userRepository.findById(replySaveRequestDto.getUserId()).orElseThrow(()->{
+//			return new IllegalArgumentException("댓글쓰기 실패: 유저 id를 찾을 수 없습니다.");
+//			//영속화 완료
+//		}) ;
+//		
+//		//빌더패턴을 통한 객체 생성 생성자
+//		Reply reply = Reply.builder()
+//				.user(user)
+//				.board(board)
+//				.content(replySaveRequestDto.getContent())
+//				.build();
+//		replyRepository.save(reply);
+		
+		//native query방식으로 쿼리는 ReplyRepository.java에 다 작성되어 있음 이 함수를 불러서 native query문을 실행함
+		int result = replyRepository.mSave(replySaveRequestDto.getUserId(), replySaveRequestDto.getBoardId(), replySaveRequestDto.getContent());
+		System.out.println("수정된 행의 수 = " + result);
+		
+	}
+	
+	@Transactional
+	public void 댓글삭제(int replyId)
+	{
+		replyRepository.deleteById(replyId);
+	}
+	
+	
+	
+//	public void 댓글쓰기(User user, int boardId, Reply requestReply)
+//	{
+//		Board board = boardRepository.findById(boardId).orElseThrow(()->{
+//			return new IllegalArgumentException("댓글쓰기 실패: 게시글 id를 찾을 수 없습니다.");
+//			//영속화 완료
+//		}) ;
+//		
+//		requestReply.setUser(user);
+//		requestReply.setBoard(board);
+//		
+//		replyRepository.save(requestReply);
+//	}
 	
 	//스프링 시큐리티를 사용하므로 이건 사용 안함
 //	@Transactional(readOnly = true) //readOnly = true를 통해 select할때 트랜잭션 시작, 서비스 종료시 트랜잭션 종료 (트랜잭션 동작동안 정합성(데이터가 항상 같도록 보장)을 유지시킬 수 있음)

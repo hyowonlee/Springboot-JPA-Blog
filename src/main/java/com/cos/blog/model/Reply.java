@@ -43,4 +43,16 @@ public class Reply {
 	
 	@CreationTimestamp
 	private Timestamp createDate;
+	
+	
+	// lombok에 있긴하지만 이런 기능이 있다는걸 알기위해서 한번더 선언
+	//toString 함수는 객체 자체를 sysout으로 리턴하면 객체의 필드들을 전부 print해주는 함수 System.out.println(reply)해주면 일일이 getter 쓸 필요 없이 바로 다 출력해줌
+	//ReplyObjectTest.java에서 테스트 해봤음
+	@Override
+	public String toString() {
+		return "Reply [id=" + id + ", content=" + content + ", board=" + board + ", user=" + user + ", createDate="
+				+ createDate + "]";
+	}
+	
+	
 }

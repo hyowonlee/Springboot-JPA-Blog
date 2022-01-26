@@ -19,6 +19,8 @@
 		</div>
 		
 		<button id="btn-login" class="btn btn-primary">로그인</button> <%--로그인 버튼을 form태그 안에 넣었기에 이걸 누르면 submit이 된다 (submit어딨나 한참 찾았는데 button으로도 되네) --%>
+		<%-- 밑이 카카오로그인 버튼으로 카카오 api에서 지정한 로그인 요청 주소로 링크 걸림--%>
+		<a href="https://kauth.kakao.com/oauth/authorize?client_id=96c3fff31177ce34a1d9f9105540d008&redirect_uri=http://localhost:8000/auth/kakao/callback&response_type=code"><img height="38px" src="/image/kakao_login_button.png"/></a>	
 	</form>
 
 </div>
