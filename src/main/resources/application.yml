@@ -1,7 +1,7 @@
 
 #https://getinthere.tistory.com/20
 server:
-  port: 8000 #내 프로젝트 포트 설정 안적으면 디폴트 8080 프로젝트 기본포트 8000으로 변경
+  port: 8080 #내 프로젝트 포트 설정 안적으면 디폴트 8080 프로젝트 기본포트 8080으로 변경
   servlet:
     context-path: / #내 프로젝트 접속 url 경로 설정 안적으면 디폴트 /
     encoding:
